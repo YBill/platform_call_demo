@@ -5,12 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="30dp"
     tools:context=".AndroidNativeActivity">
 
     <androidx.appcompat.widget.AppCompatButton
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="handleFlutter"
-        android:text="Go Flutter" />
+        android:text="Go Flutter Page" />
 
 </LinearLayout>

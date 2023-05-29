@@ -43,34 +43,59 @@ class FlutterError (
   val details: Any? = null
 ) : Throwable()
 
-/** Generated class from Pigeon that represents data sent in messages. */
-data class Book (
-  var title: String? = null,
-  var author: String? = null
+/**
+ * 控制台执行：flutter pub run pigeon --input pigeons/message.dart
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class SearchRequest (
+  val query: String? = null
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): Book {
-      val title = list[0] as String?
-      val author = list[1] as String?
-      return Book(title, author)
+    fun fromList(list: List<Any?>): SearchRequest {
+      val query = list[0] as String?
+      return SearchRequest(query)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
-      title,
-      author,
+      query,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class SearchReply (
+  val result: String? = null
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): SearchReply {
+      val result = list[0] as String?
+      return SearchReply(result)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      result,
     )
   }
 }
 @Suppress("UNCHECKED_CAST")
-private object BookApiCodec : StandardMessageCodec() {
+private object FlutterCallNativeApiCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
       128.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          Book.fromList(it)
+          SearchReply.fromList(it)
+        }
+      }
+      129.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SearchRequest.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -78,8 +103,12 @@ private object BookApiCodec : StandardMessageCodec() {
   }
   override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
     when (value) {
-      is Book -> {
+      is SearchReply -> {
         stream.write(128)
+        writeValue(stream, value.toList())
+      }
+      is SearchRequest -> {
+        stream.write(129)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -87,27 +116,31 @@ private object BookApiCodec : StandardMessageCodec() {
   }
 }
 
-/** Generated interface from Pigeon that represents a handler of messages from Flutter. */
-interface BookApi {
-  fun search(keyword: String): List<Book?>
+/**
+ * flutter call native
+ *
+ * Generated interface from Pigeon that represents a handler of messages from Flutter.
+ */
+interface FlutterCallNativeApi {
+  fun search(request: SearchRequest): SearchReply
 
   companion object {
-    /** The codec used by BookApi. */
+    /** The codec used by FlutterCallNativeApi. */
     val codec: MessageCodec<Any?> by lazy {
-      BookApiCodec
+      FlutterCallNativeApiCodec
     }
-    /** Sets up an instance of `BookApi` to handle messages through the `binaryMessenger`. */
+    /** Sets up an instance of `FlutterCallNativeApi` to handle messages through the `binaryMessenger`. */
     @Suppress("UNCHECKED_CAST")
-    fun setUp(binaryMessenger: BinaryMessenger, api: BookApi?) {
+    fun setUp(binaryMessenger: BinaryMessenger, api: FlutterCallNativeApi?) {
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.BookApi.search", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.FlutterCallNativeApi.search", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val keywordArg = args[0] as String
+            val requestArg = args[0] as SearchRequest
             var wrapped: List<Any?>
             try {
-              wrapped = listOf<Any?>(api.search(keywordArg))
+              wrapped = listOf<Any?>(api.search(requestArg))
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)
             }
@@ -117,6 +150,59 @@ interface BookApi {
           channel.setMessageHandler(null)
         }
       }
+    }
+  }
+}
+@Suppress("UNCHECKED_CAST")
+private object NativeCallFlutterApiCodec : StandardMessageCodec() {
+  override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
+    return when (type) {
+      128.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SearchReply.fromList(it)
+        }
+      }
+      129.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SearchRequest.fromList(it)
+        }
+      }
+      else -> super.readValueOfType(type, buffer)
+    }
+  }
+  override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
+    when (value) {
+      is SearchReply -> {
+        stream.write(128)
+        writeValue(stream, value.toList())
+      }
+      is SearchRequest -> {
+        stream.write(129)
+        writeValue(stream, value.toList())
+      }
+      else -> super.writeValue(stream, value)
+    }
+  }
+}
+
+/**
+ * native call flutter
+ *
+ * Generated class from Pigeon that represents Flutter messages that can be called from Kotlin.
+ */
+@Suppress("UNCHECKED_CAST")
+class NativeCallFlutterApi(private val binaryMessenger: BinaryMessenger) {
+  companion object {
+    /** The codec used by NativeCallFlutterApi. */
+    val codec: MessageCodec<Any?> by lazy {
+      NativeCallFlutterApiCodec
+    }
+  }
+  fun query(requestArg: SearchRequest, callback: (SearchReply) -> Unit) {
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.NativeCallFlutterApi.query", codec)
+    channel.send(listOf(requestArg)) {
+      val result = it as SearchReply
+      callback(result)
     }
   }
 }
