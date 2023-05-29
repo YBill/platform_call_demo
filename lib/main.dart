@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'pigeon.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -57,7 +59,16 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  Future<void> test() async {
+    BookApi api = BookApi();
+    List<Book?> reply = await api.search("Aaron");
+    print("native return data -> ${reply[0]?.title}");
+  }
+
   void _incrementCounter() {
+
+    test();
+
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
